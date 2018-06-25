@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title></title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="./js/db_core.js"></script>
+</head>
+
+<body>
+
+<script>
+
+//データベースをセット
+DBTest = new Database ("DBTest");
+
+//テーブル名とカラム名をセット
+DBTest.CreateTable("members",Array("id","login","passwd","tel","fax"));
+
+//ファイルを取得してデータに追加
+csvInsert("list.csv");
+
+//select文で抽出
+var selectArr1 = DBTest.Select('select * from members');
+
+//書き出し
+DBTest.View(selectArr1,document);
+
+//Ajaxでファイルを取得してデータ追加するfunction
+function csvInsert(filename){
+	$.ajax({
+		url: filename,
+		type: 'get',
+		dataType: 'text',
+		async: false
+	})
+	.success(function(data){
+		//改行で分割
+		lines = data.split("\r\n");
+		for(var i=0; i < lines.length; i++){
+			if(lines[i] != ""){
+				//カンマで分割して配列に
+				var col = lines[i].split(",");
+				//配列をテーブルに追加
+				DBTest.Insert("members",col);
+			}
+		}
+	});
+}
+
+</script>
+
+</body>
+</html>
